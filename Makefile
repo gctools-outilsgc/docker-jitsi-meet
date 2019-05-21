@@ -1,5 +1,6 @@
 FORCE_REBUILD ?= 0
 JITSI_RELEASE ?= "stable"
+JITSI_BUILD ?= "latest"
 
 ifeq ($(FORCE_REBUILD), 1)
   BUILD_ARGS = "--no-cache"
@@ -12,13 +13,37 @@ build-all:
 	BUILD_ARGS=$(BUILD_ARGS) $(MAKE) -C prosody build
 	BUILD_ARGS=$(BUILD_ARGS) $(MAKE) -C jicofo build
 	BUILD_ARGS=$(BUILD_ARGS) $(MAKE) -C jvb build
+	BUILD_ARGS=$(BUILD_ARGS) $(MAKE) -C jigasi build
+
+tag-all:
+	docker tag jitsi/base:latest jitsi/base:$(JITSI_BUILD)
+	docker tag jitsi/base-java:latest jitsi/base-java:$(JITSI_BUILD)
+	docker tag jitsi/web:latest jitsi/web:$(JITSI_BUILD)
+	docker tag jitsi/prosody:latest jitsi/prosody:$(JITSI_BUILD)
+	docker tag jitsi/jicofo:latest jitsi/jicofo:$(JITSI_BUILD)
+	docker tag jitsi/jvb:latest jitsi/jvb:$(JITSI_BUILD)
+	docker tag jitsi/jigasi:latest jitsi/jigasi:$(JITSI_BUILD)
 
 push-all:
-	cd base && docker push jitsi/base && cd ..
-	cd base-java && docker push jitsi/base-java && cd ..
-	cd web && docker push jitsi/web && cd ..
-	cd prosody && docker push jitsi/prosody && cd ..
-	cd jicofo && docker push jitsi/jicofo && cd ..
-	cd jvb && docker push jitsi/jvb && cd ..
+	docker push jitsi/base:latest
+	docker push jitsi/base-java:latest
+	docker push jitsi/web:latest
+	docker push jitsi/prosody:latest
+	docker push jitsi/jicofo:latest
+	docker push jitsi/jvb:latest
+	docker push jitsi/jigasi:latest
+	docker push jitsi/base:$(JITSI_BUILD)
+	docker push jitsi/base-java:$(JITSI_BUILD)
+	docker push jitsi/web:$(JITSI_BUILD)
+	docker push jitsi/prosody:$(JITSI_BUILD)
+	docker push jitsi/jicofo:$(JITSI_BUILD)
+	docker push jitsi/jvb:$(JITSI_BUILD)
+	docker push jitsi/jigasi:$(JITSI_BUILD)
 
-.PHONY: build-all push-all
+
+clean:
+	docker-compose stop
+	docker-compose rm
+	docker network prune
+
+.PHONY: build-all tag-all push-all clean

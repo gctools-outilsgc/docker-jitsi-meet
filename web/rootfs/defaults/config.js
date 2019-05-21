@@ -18,9 +18,6 @@ var config = {
         // XMPP domain.
         domain: 'jitsi-meet.example.com',
 
-        // XMPP MUC domain. FIXME: use XEP-0030 to discover it.
-        muc: 'conference.jitsi-meet.example.com'
-
         // When using authentication, domain for guest users.
         // anonymousdomain: 'guest.example.com',
 
@@ -35,6 +32,9 @@ var config = {
 
         // Focus component domain. Defaults to focus.<domain>.
         // focus: 'focus.jitsi-meet.example.com',
+
+        // XMPP MUC domain. FIXME: use XEP-0030 to discover it.
+        muc: 'conference.jitsi-meet.example.com'
     },
 
     // BOSH URL. FIXME: use XEP-0156 to discover it.
@@ -99,13 +99,13 @@ var config = {
     // used by browsers that return true from lib-jitsi-meet's
     // util#browser#usesNewGumFlow. The constraints are independency from
     // this config's resolution value. Defaults to requesting an ideal aspect
-    // ratio of 16:9 with an ideal resolution of 1080p.
+    // ratio of 16:9 with an ideal resolution of 720.
     // constraints: {
     //     video: {
     //         aspectRatio: 16 / 9,
     //         height: {
-    //             ideal: 1080,
-    //             max: 1080,
+    //             ideal: 720,
+    //             max: 720,
     //             min: 240
     //         }
     //     }
@@ -142,14 +142,11 @@ var config = {
 
     // Desktop sharing
 
-    // Enable / disable desktop sharing
-    // disableDesktopSharing: false,
-
     // The ID of the jidesha extension for Chrome.
     desktopSharingChromeExtId: null,
 
     // Whether desktop sharing should be disabled on Chrome.
-    desktopSharingChromeDisabled: true,
+    // desktopSharingChromeDisabled: false,
 
     // The media sources to use when using screen sharing with the Chrome
     // extension.
@@ -159,7 +156,7 @@ var config = {
     desktopSharingChromeMinExtVersion: '0.1',
 
     // Whether desktop sharing should be disabled on Firefox.
-    desktopSharingFirefoxDisabled: false,
+    // desktopSharingFirefoxDisabled: false,
 
     // Optional desktop sharing frame rate options. Default value: min:5, max:5.
     // desktopSharingFrameRate: {
@@ -174,9 +171,17 @@ var config = {
 
     // Whether to enable file recording or not.
     // fileRecordingsEnabled: false,
+    // Enable the dropbox integration.
+    // dropbox: {
+    //     appKey: '<APP_KEY>' // Specify your app key here.
+    // },
 
     // Whether to enable live streaming or not.
     // liveStreamingEnabled: false,
+
+    // Transcription (in interface_config,
+    // subtitles and buttons can be configured)
+    // transcribingEnabled: false,
 
     // Misc
 
@@ -236,10 +241,6 @@ var config = {
     // Disable hiding of remote thumbnails when in a 1-on-1 conference call.
     // disable1On1Mode: false,
 
-    // The minimum value a video's height (or width, whichever is smaller) needs
-    // to be in order to be considered high-definition.
-    minHDHeight: 540,
-
     // Default language for the user interface.
     // defaultLanguage: 'en',
 
@@ -248,10 +249,16 @@ var config = {
     // edit their profile.
     enableUserRolesBasedOnToken: false,
 
+    // Whether or not some features are checked based on token.
+    // enableFeaturesBasedOnToken: false,
+
     // Message to show the users. Example: 'The service will be down for
     // maintenance at 01:00 AM GMT,
     // noticeMessage: '',
 
+    // Enables calendar integration, depends on googleApiApplicationClientID
+    // and microsoftApiApplicationClientID
+    // enableCalendarIntegration: false,
 
     // Stats
     //
@@ -327,14 +334,19 @@ var config = {
         // backToP2PDelay: 5
     },
 
-    // A list of scripts to load as lib-jitsi-meet "analytics handlers".
-    // analyticsScriptUrls: [
-    //      "libs/analytics-ga.js", // google-analytics
-    //      "https://example.com/my-custom-analytics.js"
-    // ],
+    analytics: {
+        // The Google Analytics Tracking ID:
+        // googleAnalyticsTrackingId: 'your-tracking-id-UA-123456-1'
 
-    // The Google Analytics Tracking ID
-    // googleAnalyticsTrackingId = 'your-tracking-id-here-UA-123456-1',
+        // The Amplitude APP Key:
+        // amplitudeAPPKey: '<APP_KEY>'
+
+        // Array of script URLs to load as lib-jitsi-meet "analytics handlers".
+        // scriptURLs: [
+        //      "libs/analytics-ga.min.js", // google-analytics
+        //      "https://example.com/my-custom-analytics.js"
+        // ],
+    },
 
     // Information about the jitsi-meet instance we are connecting to, including
     // the user region as seen by the server.
@@ -344,8 +356,46 @@ var config = {
         // userRegion: "asia"
     }
 
+    // Local Recording
+    //
+
+    // localRecording: {
+    // Enables local recording.
+    // Additionally, 'localrecording' (all lowercase) needs to be added to
+    // TOOLBAR_BUTTONS in interface_config.js for the Local Recording
+    // button to show up on the toolbar.
+    //
+    //     enabled: true,
+    //
+
+    // The recording format, can be one of 'ogg', 'flac' or 'wav'.
+    //     format: 'flac'
+    //
+
+    // }
+
+    // Options related to end-to-end (participant to participant) ping.
+    // e2eping: {
+    //   // The interval in milliseconds at which pings will be sent.
+    //   // Defaults to 10000, set to <= 0 to disable.
+    //   pingInterval: 10000,
+    //
+    //   // The interval in milliseconds at which analytics events
+    //   // with the measured RTT will be sent. Defaults to 60000, set
+    //   // to <= 0 to disable.
+    //   analyticsInterval: 60000,
+    //   }
+
+    // If set, will attempt to use the provided video input device label when
+    // triggering a screenshare, instead of proceeding through the normal flow
+    // for obtaining a desktop stream.
+    // NOTE: This option is experimental and is currently intended for internal
+    // use only.
+    // _desktopSharingSourceDevice: 'sample-id-or-label'
+
     // List of undocumented settings used in jitsi-meet
     /**
+     _immediateReloadThreshold
      autoRecord
      autoRecordToken
      debug
@@ -362,8 +412,10 @@ var config = {
      externalConnectUrl
      firefox_fake_device
      googleApiApplicationClientID
+     googleApiIOSClientID
      iAmRecorder
      iAmSipGateway
+     microsoftApiApplicationClientID
      peopleSearchQueryTypes
      peopleSearchUrl
      requireDisplayName
@@ -392,6 +444,7 @@ var config = {
      nick
      startBitrate
      */
+
 };
 
 /* eslint-enable no-unused-vars, no-var */
